@@ -1,4 +1,6 @@
 # Job-Application-Tracker
+
+CRUD application with Webscrapper to locate for jobs
 jat crud webscrap job findings
 
 
