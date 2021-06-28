@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Coding | Search</title>
+</head>
+<body>
+	{% if contacts %}
+	<h1>Your Applied Jobs</h1>
+
+	{% else %}
+	<h1>Your Applied Jobs Not Found</h1>
+
+	{% endif %}
+	
+	<div>
+		{% for contact in contacts %}
+			<h5>{{contact}}</h5>
+			<h5>{{contacts}}</h5>
+			<h5>{{contact.purpose}}</h5>
+			<h5>{{contacts.role}}</h5>
+			<h5>{{contact.location}}</h5>
+			<h5>{{contact.date}}</h5>
+			<h5>{{contact.message}}</h5>
+			<a href="{{main.contact.url}}">Read </a>
+			<hr>
+
+		{% endfor %}
+</body>
+</html>

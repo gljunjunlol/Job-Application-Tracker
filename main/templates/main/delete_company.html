@@ -1,0 +1,38 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+View
+{% endblock %}
+
+{% block content %}
+<style>
+
+	body{
+		background-color: #638CB8;
+	}
+
+	input{
+		width: 100%;
+		padding: 12px 20px;
+		margin: 8px 0;
+		box-sizing: border-box;
+	}
+
+	input::placeholder {
+	  color: #d3d3d3;
+	}
+
+	.submit{
+		background-color: #6BA3E8;
+	}
+</style>
+<div class="center-column">
+	<p>Are you sure you want to delete "{{contact}}"?</p>
+</div>
+<div class="item-row">
+	<a class="btn btn-sm btn-info" href="{% url 'create' %}">Cancel</a>
+	<form method="POST" action="">
+		{% csrf_token %}
+		<input class="btn btn-info" type="submit" name="Confirm">
+	</form>
+{% endblock %}

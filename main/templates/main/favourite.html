@@ -1,0 +1,19 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+View
+{% endblock %}
+
+{% block content %}
+	{% for contact in contacts %}
+  <tr>
+    <div class="item-row">
+      <a class="btn btn-sm btn-info" href="{% url 'update_company' contact.id %}">Update</a>
+      <a class="btn btn-lg btn-danger" href="{% url 'delete_company' contact.id %}">Delete</a>
+    <strong>{{contact}}</strong>
+  </tr>
+
+{% endfor %}
+</table>
+{% endblock %}
+

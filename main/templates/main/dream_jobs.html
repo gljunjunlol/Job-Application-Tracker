@@ -1,0 +1,25 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+View
+{% endblock %}
+
+{% block content %}
+
+<h1>How should i approach the dream job</h1>
+	{% for td in user.todolist.all %}
+		<p><a href="/{{td.id}}">{{td.name}}</a></p>
+    <strong>{{td}}</strong>
+    
+    
+    <a class="btn btn-danger" href="{% url 'delete2' td.id %}">Delete</a>
+  
+    
+	{% endfor %}
+
+	
+    
+{% endblock %}
+
+
+  

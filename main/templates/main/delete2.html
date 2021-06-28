@@ -1,0 +1,9 @@
+<div class="center-column">
+	<p>Are you sure you want to delete "{{todolist}}"?</p>
+</div>
+<div class="item-row">
+	<a class="btn btn-sm btn-info" href="{% url 'create2' %}">Cancel</a>
+	<form method="POST" action="">
+		{% csrf_token %}
+		<input class="btn btn-info" type="submit" name="Confirm">
+	</form>
