@@ -11,3 +11,5 @@ Job-Application-Tracker
 Adding Applied Job Information, for recording of own job application
 
 Webscrap to find jobs online
+
+Dream jobs to keep track of career goals and aspirations
