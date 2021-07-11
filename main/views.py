@@ -90,23 +90,34 @@ def home(response):
 
 def create(request):
 
-	a = Contact.objects.all()
-
-	form1 = ContactForm()
-
-	if request.method == 'POST':
-		form1 = ContactForm(request.POST)
-		if form1.is_valid():
-			form1.save()
-
-			return redirect("/")
+	if not request.user.is_authenticated:
+		return redirect('/login')
 	else:
-		messages.error(request, "Your error message")
-		form = ContactForm()
+		a = Contact.objects.filter(user=request.user)
 
-	context = {'contacts':a, 'form1': form1}
-	
-	return render(request, "main/create.html", context)
+		form1 = ContactForm()
+
+		if request.method == 'POST':
+			form1 = ContactForm(request.POST)
+			if form1.is_valid():
+				n = form1.cleaned_data["name"]
+				e = form1.cleaned_data["email"]
+				p = form1.cleaned_data["purpose"]
+				l = form1.cleaned_data["location"]
+				d = form1.cleaned_data["date"]
+				m = form1.cleaned_data["message"]
+				t = Contact(name=n,email=e,purpose=p,location=l,date=d,message=m)
+				t.save()
+				request.user.contact.add(t)
+
+				return redirect("/")
+		else:
+			messages.error(request, "Your error message")
+			form = ContactForm()
+
+		context = {'contacts':a, 'form1': form1}
+		
+		return render(request, "main/create.html", context)
 
 
 def updateCompany(request, pk):
@@ -143,15 +154,77 @@ def view(response):
 
 def favourite(response):
 
-	a = Contact.objects.all()
+	if not response.user.is_authenticated:
+		return redirect('/login')
+	else:
+		a = Contact.objects.filter(user=response.user)
 
 
-	context = {'contacts':a}
+		context = {'contacts':a}
 
-	return render(response, "main/favourite.html", context)
+		return render(response, "main/favourite.html", context)
 
 
 
+def jobs(request):
+	job_data = None
+	from bs4 import BeautifulSoup
+
+	import grequests
+	import requests
+	import time
+	import numpy as np
+
+	start_time = time.time()
+	
+
+	
+	
+	
+	all_jobs = []
+	
+	links = ["https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=1&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=2&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=3&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=4&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=5&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=6&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=7&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=8&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=9&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=10&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=11&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=12&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=13&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=14&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=15&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=16&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=17&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=18startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=19&startPage=1",
+	 "https://www.timesjobs.com/candidate/job-search.html?from=submit&actualTxtKeywords=python&searchBy=0&rdoOperator=OR&searchType=personalizedSearch&luceneResultSize=25&postWeek=60&txtKeywords=python&pDate=I&sequence=20&startPage=1"]
+	pages = np.arange(0, 20, 1)
+
+	reqs = (grequests.get(link) for link in links)
+	resp = grequests.imap(reqs, grequests.Pool(20))
+	for r in resp:
+		soup = BeautifulSoup(r.text, 'html.parser')
+		jobs = soup.find_all('li', class_ = 'clearfix job-bx wht-shd-bx')
+
+		for jb in jobs:
+			published_date = jb.find('span', class_= 'sim-posted').span.text
+			company_name = jb.find('h3', class_ = 'joblist-comp-name').text.strip()
+			skill = jb.find('span', class_= 'srp-skills').text.replace(' ','')
+			more_info = jb.header.h2.a['href']
+
+
+			all_jobs.append(published_date + company_name + skill + more_info)
+
+	
+	
+	return render(request, "main/jobs.html", {'all_jobs' : all_jobs})
+
+""" Synchronous slower method
 def jobs(request):
 	job_data = None
 	from bs4 import BeautifulSoup
@@ -185,18 +258,18 @@ def jobs(request):
 
 	
 	
-	return render(request, "main/jobs.html", {'all_jobs' : all_jobs})
+	return render(request, "main/jobs.html", {'all_jobs' : all_jobs})"""
 
 def search(request):
 	qur = request.GET.get('search').lower()
 	# contacts = Contact.objects.filter(name__contains = qur)
-	a = [item for item in Contact.objects.all() if qur in item.name.lower() or qur in item.email.lower() or qur in item.purpose.lower() or qur in item.role.lower() or qur in item.location.lower() or qur in item.message.lower()]
+	a = [item for item in Contact.objects.filter(user=request.user) if qur in item.name.lower() or qur in item.email.lower() or qur in item.purpose.lower() or qur in item.role.lower() or qur in item.location.lower() or qur in item.message.lower()]
 	return render(request, 'main/search.html', {'contacts': a})
 
 
 def saved_jobs(response):
 
-	a = Contact.objects.all()
+	a = Contact.objects.filter(user=response.user)
 
 	context = {'contacts' : a}
 	return render(response, "main/saved_jobs.html", context)

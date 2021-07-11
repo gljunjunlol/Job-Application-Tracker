@@ -8,8 +8,15 @@ Create New List
 	<form method="post" action="/create2/">
     {% csrf_token %}
     {{form.as_p}}
+    {% if user.is_authenticated %}   
     <button type="submit", name="save">Create New</button>
+    {% else %}
+    <button type="button">
+        <a href="{% url 'login' %}">Create New</a>
+    </button>
+    {% endif %}
   </form>
+  
 
   
 

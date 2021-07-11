@@ -31,6 +31,7 @@ class Contact(models.Model):
 
     ]
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="contact", null=True)
     name = models.CharField(max_length=100)
     # can put EmailField for email
     email = models.CharField(max_length=100)
